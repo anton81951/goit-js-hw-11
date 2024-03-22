@@ -1,103 +1,40 @@
-import flatpickr from "flatpickr";
-import "flatpickr/dist/flatpickr.min.css";
 import iziToast from "izitoast";
 import "izitoast/dist/css/iziToast.min.css";
 
-const button = document.querySelector("[data-start]");
-button.disabled = true;
+const form = document.querySelector('.form');
+const input = document.querySelector('.input');
 
-const timerFields = {
-  days: document.querySelector("[data-days]"),
-  hours: document.querySelector("[data-hours]"),
-  minutes: document.querySelector("[data-minutes]"),
-  seconds: document.querySelector("[data-seconds]")
-};
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
 
-let countdownInterval;
-let selectedDate;
+  const searchInput = input.value.trim();
 
-const options = {
-  enableTime: true,
-  time_24hr: true,
-  defaultDate: new Date(),
-  minuteIncrement: 1,
-  onClose(selectedDates) {
-    selectedDate = selectedDates[0];
-    const currentDate = new Date();
-    if (selectedDate >= currentDate) {
-      button.disabled = false;
-    } else {
-      iziToast.error({
-        title: 'Error',
-        message: 'Please choose a date in the future and reload the page',
-        position: 'topCenter'
+  if (searchInput !== "") {
+    const apiKey = '9233093-942588744ee96c4f575017f3e';
+    const url = `https://pixabay.com/api/?key=${apiKey}&q=${searchInput}&image_type=photo&orientation=horizontal&safesearch=true`;
+    fetch(url)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network res not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log(data);
+      })
+      .catch(error => {
+        console.error('fetch problem', error);
       });
-      picker.clear();
-      button.disabled = true;
-    }
-  },
-};
-
-const picker = flatpickr("#datetime-picker", options);
-
-function convertMs(ms) {
-  const second = 1000;
-  const minute = second * 60;
-  const hour = minute * 60;
-  const day = hour * 24;
-
-  // Remaining days
-  const days = Math.floor(ms / day);
-  // Remaining hours
-  const hours = Math.floor((ms % day) / hour);
-  // Remaining minutes
-  const minutes = Math.floor(((ms % day) % hour) / minute);
-  // Remaining seconds
-  const seconds = Math.floor((((ms % day) % hour) % minute) / second);
-
-  return { days, hours, minutes, seconds };
-}
-
-function startCountdown() {
-  clearInterval(countdownInterval);
-
-  countdownInterval = setInterval(() => {
-    const now = new Date().getTime();
-    const difference = selectedDate.getTime() - now;
-
-    if (difference <= 0) {
-      clearInterval(countdownInterval);
-      updateTimerDisplay(0, 0, 0, 0);
-      button.disabled = false;
-      return;
-    }
-
-    const { days, hours, minutes, seconds } = convertMs(difference);
-
-    updateTimerDisplay(days, hours, minutes, seconds);
-  }, 1000);
-}
-
-function updateTimerDisplay(days, hours, minutes, seconds) {
-  timerFields.days.textContent = formatTimeValue(days);
-  timerFields.hours.textContent = formatTimeValue(hours);
-  timerFields.minutes.textContent = formatTimeValue(minutes);
-  timerFields.seconds.textContent = formatTimeValue(seconds);
-}
-
-function formatTimeValue(value) {
-  return value < 10 ? `0${value}` : value;
-}
-
-button.addEventListener("click", function () {
-  if (!selectedDate) {
+  } else {
     iziToast.error({
       title: 'Error',
-      message: 'Please choose a date',
+      message: "Sorry, there are no images matching your search query. Please try again!",
       position: 'topCenter'
     });
-    return;
+    iziToast.error({
+      title: 'Error',
+      message: "Empty input!",
+      position: 'topCenter'
+    });
   }
-
-  startCountdown();
 });
