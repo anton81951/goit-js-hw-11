@@ -8,7 +8,7 @@ document.querySelector(".form").addEventListener("submit", event => {
 });
 
 function pixabaySearch(event) {
-  event.preventDefault();
+  event?.preventDefault();
 
   const form = document.querySelector('.form');
   const input = document.querySelector('.input');
@@ -23,7 +23,6 @@ function pixabaySearch(event) {
     fetch(url)
       .then(response => response.json())
       .then(data => {
-        console.log(data);
         if (data.hits.length === 0) {
           iziToast.error({
             title: 'Error',
