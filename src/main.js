@@ -18,11 +18,7 @@ searchButton.addEventListener('click', () => {
         loader.style.display = 'none';
     }).catch(error => {
         loader.style.display = 'none';
-        iziToast.error({
-            title: 'Error',
-            message: error.message,
-            position: 'topCenter'
-        });
+        console.error('loader problem', error);
     });
 });
 

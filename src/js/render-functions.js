@@ -65,6 +65,4 @@ function displayImages(images) {
 
 }
 
-
-
 export { displayImages };
